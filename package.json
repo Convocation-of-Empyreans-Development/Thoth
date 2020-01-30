@@ -1,0 +1,29 @@
+{
+  "name": "aura-4-discord",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "storeFacWarSystems": "node server/fwRunner.js"
+  },
+  "author": "Ashterothi",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "discord.js": "^11.0.0",
+    "eveonlinejs": "^2.0.2",
+    "express": "^4.14.0",
+    "jsonwebtoken": "^7.2.1",
+    "lodash": "^4.17.4",
+    "moment": "^2.17.1",
+    "moment-timezone": "^0.5.11",
+    "node-schedule": "^1.2.0",
+    "nodemailer": "^4.1.0",
+    "pg": "^6.1.2",
+    "pg-hstore": "^2.3.2",
+    "request": "^2.79.0",
+    "sequelize": "^3.28.0",
+    "yargs": "^6.6.0"
+  }
+}
