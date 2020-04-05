@@ -12,6 +12,10 @@ pipeline {
         sh 'npm install'
       }
     }
-
+    stage('run-bot') {
+      steps {
+        sh 'node ./server.js'
+      }
+    }
   }
 }
