@@ -2,17 +2,15 @@
 
 const nodemailer = require('nodemailer');
 var emailCredentials = {
-  host: 'smtp.gmail.com'
-  senderAddress: 'convocationofempyreans@gmail.com'
-  port: 587;
-  secure: false;
+  host: 'smtp.gmail.com',
+  senderAddress: 'convocationofempyreans@gmail.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: "convocationofempyreans@gmail.com"
+    user: "convocationofempyreans@gmail.com",
     password: "Atron11235"
-  }
-  recievers = {
-    [ "Ashterothi@gmail.com", "convocationofempyreans@gmail.com" ]
-  }
+  },
+  recievers: [ "Ashterothi@gmail.com", "convocationofempyreans@gmail.com" ]
 }
 
 
