@@ -1,25 +1,37 @@
 'use strict';
 
 const nodemailer = require('nodemailer');
+var emailCredentials = {
+  host: 'smtp.gmail.com'
+  senderAddress: 'convocationofempyreans@gmail.com'
+  port: 587;
+  secure: false;
+  auth: {
+    user: "convocationofempyreans@gmail.com"
+    password: "Atron11235"
+  }
+  recievers = {
+    [ "Ashterothi@gmail.com", "convocationofempyreans@gmail.com" ]
+  }
+}
+
+
 
 
 function sendReport(text) {
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: "fedupbot@gmail.com", // generated ethereal user
-        pass: "dfg49v2@qkzZs"  // generated ethereal password
-      }
+      host: emailCredentials.host,
+      port: emailCredentials.port,
+      secure: emailCredentials.secure, // true for 465, false for other ports
+      auth: emailCredentials.auth
     });
 
     // setup email data with unicode symbols
     let mailOptions = {
-      from: 'fedupbot@gmail.com', // sender address
-      to: 'Ashterothi@gmail.com, cvtate83@gmail.com, joel.trauger@gmail.com', // list of receivers
+      from: emailCredentials.senderAddress, // sender address
+      to: emailCredentials.recievers, // list of receivers
       subject: 'FEDUP scheduled validation report for ' + new Date().toDateString(), // Subject line
       text: text // plain text body
     };
