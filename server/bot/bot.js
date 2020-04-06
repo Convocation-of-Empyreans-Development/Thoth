@@ -91,7 +91,7 @@ Permissions.checkPermission = function (user, permission) {
    return false;*/
   return true;
 }
-fs.writeFile("./permissions.json", JSON.stringify(Permissions, null, 2));
+fs.writeFile("./permissions.json", JSON.stringify(Permissions, null, 2), () => {});
 
 bot.on("ready", function () {
   //console.log(bot.channels.get(lobby));
