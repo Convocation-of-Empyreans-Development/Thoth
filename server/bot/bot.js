@@ -1,18 +1,15 @@
 var Discord = require("discord.js");
 var fs = require('fs');
+var bot = new Discord.Client();
 
 console.log("Starting Discord Bot...");
 
 var AuthDetails = require("./auth.json");
 
-var lobby = "82165230402015232";
-var bot_testing = "177935268521836544";
 
-var access_request = "249630726012665876";
 
-var member_role = "243784184298995712";
 
-var bot = new Discord.Client();
+
 
 var models = require('../models');
 
