@@ -377,7 +377,7 @@ var commands = {
     usage: "<code>",
     description: 'Registers your EVE account using your Discord Code',
     process: function (bot, msg, suffix) {
-      models.user.findOne({
+      models.aider_users.findOne({
         where: {discord_id: suffix}
       }).then(function (user) {
         if (user && user.dataValues) {
@@ -398,7 +398,7 @@ var commands = {
   "name": {
     description: 'Tells you your EVE characters name.',
     process: function (bot, msg, suffix) {
-      models.user.findOne({
+      models.aider_users.findOne({
         where: {discord_id: msg.author.id}
       }).then(function (user) {
         if (user && user.dataValues) {

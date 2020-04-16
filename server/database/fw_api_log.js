@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function(sequelize, DataTypes) {
+/*module.exports = function(sequelize, DataTypes) {
   var FwApiLog = sequelize.define("fw_api_log", {
     cached_until:  {
       type: DataTypes.DATE,
@@ -11,4 +11,4 @@ module.exports = function(sequelize, DataTypes) {
   });
 
   return FwApiLog;
-};
+};*/

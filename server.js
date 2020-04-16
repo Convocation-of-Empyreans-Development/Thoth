@@ -71,16 +71,19 @@ app.get('/', function(req, res){
 app.get('/api/token/get-token', tokenController.validateToken);
 app.get('/api/token/refresh-token', tokenController.refreshToken);
 
-models.sequelize.sync().then(function(){
+models.sequelize.authenticate().then(function(){
 	Object.keys(models).forEach(function(modelName) {
 		if ('initialize' in models[modelName]) {
 		  console.log('initilizing ' + modelName);
 		  models[modelName].initialize(models);
 		}
-  	});
+	});
 	app.listen(port, function(){
 		console.log("It works!");
+
+		console.log(models);
+		//models.query("SELECT * FROM aider_permission").success(function(myTableRows) {
+
+//})
 	})
 });
-
-
