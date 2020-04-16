@@ -402,10 +402,10 @@ var commands = {
         where: {discord_id: msg.author.id}
       }).then(function (user) {
         if (user && user.dataValues) {
-          msg.author.sendMessage(user.dataValues.name);
+          msg.author.send(JSON.stringify(user.dataValues.main_id));
         }
         else {
-          msg.author.sendMessage("Not Found!");
+          msg.author.send("Not Found!");
         }
         console.log(user);
       });
@@ -435,6 +435,17 @@ var commands = {
       msg.author.sendMessage("http://services.jerkasauruswrecks.com:3000");
     }
 
+  },
+  "testfoo": {
+    description: 'testfoo',
+    process: function (bot, msg, suffix) {
+      models.eve_characters.findOne({
+        where: {character_id: suffix}
+      }).then(function(user){
+
+        msg.author.send(JSON.stringify(user));
+      })
+    }
   },
   "corp": {
     description: 'Displays your corporation',
