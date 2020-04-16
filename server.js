@@ -81,7 +81,7 @@ models.sequelize.authenticate().then(function(){
 	app.listen(port, function(){
 		console.log("It works!");
 
-		console.log(models);
+		//console.log(models);
 		//models.query("SELECT * FROM aider_permission").success(function(myTableRows) {
 
 //})
