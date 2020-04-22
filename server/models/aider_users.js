@@ -35,6 +35,7 @@ module.exports = function(sequelize, DataTypes) {
 
   aider_users.associate = function(models){
     aider_users.belongsTo(models.eve_characters, {foreignKey:'main_id', sourceKey: 'character_id'});
+    aider_users.belongsToMany(models.aider_roles, {through: 'aider_user_roles', foreignKey:'user_id', otherkey: 'role_id'});
   }
   return aider_users;
 };

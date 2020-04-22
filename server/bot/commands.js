@@ -149,7 +149,27 @@ var commands = {
   "testfoo": {
     description: 'testfoo',
     process: function (bot, msg, models, suffix) {
-      msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
+      models.aider_users.findOne({
+        where: {discord_id: msg.author.id},
+        include:[{
+          model: models.aider_roles,
+          throguh: {
+            model: models.aider_user_roles,
+            foreignKey: 'user_id',
+            otherkey: 'role_id'
+          }
+        }]
+      }).then(function (user) {
+        if (user && user.dataValues) {
+            msg.author.send(JSON.stringify(user.dataValues));
+        }
+        else {
+          msg.author.send("Not Found!");
+        }
+        console.log(user);
+      }).catch(error => {console.log(error.message)});
+
+      //msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
     }
   },
   "corp": {
