@@ -1,16 +1,7 @@
 var Discord = require("discord.js");
-var fs = require('fs');
-var bot = new Discord.Client();
-
-console.log("Starting Discord Bot...");
-
+var fs = require('fs'); //filesystem
+var bot = new Discord.Client;
 var AuthDetails = require("./auth.json");
-
-
-
-
-
-
 var models = require('../models');
 
 var corporations = require('./corporations.js');
@@ -21,6 +12,7 @@ var _ = require('lodash');
 var eveonlinejs = require('eveonlinejs');
 var moment = require('moment');
 
+var channels = require('./channels.js');
 var joinableChannels = require('./joinableChannels.js');
 var sendReport = require('./sendReport.js');
 var schedule = require('node-schedule');
@@ -28,10 +20,12 @@ var schedule = require('node-schedule');
 //load config data
 var Config = {};
 
+console.log("Starting Discord Bot...");
 
 try {
   Config = require("./config.json");
 } catch (e) { //no config file, use defaults
+  console.log("No config file found, setting default config. " + e);
   Config.debug = false;
   Config.commandPrefix = '!';
   try {
@@ -42,6 +36,7 @@ try {
     fs.writeFile("./config.json", JSON.stringify(Config, null, 2));
   }
 }
+
 if (!Config.hasOwnProperty("commandPrefix")) {
   Config.commandPrefix = '!';
 }
@@ -51,7 +46,7 @@ var aliases;
 try {
   aliases = require("./alias.json");
 } catch (e) {
-  //No aliases defined
+  console.log("No Allias file found, setting default Allias. " + e);
   aliases = {};
 }
 
@@ -59,8 +54,9 @@ try {
 var dangerousCommands = []//"eval","pullanddeploy","setUsername"];
 var Permissions = {};
 try {
-  Permissions = require("./permissions.json");
+  Permissions = require("./permissions.js");
 } catch (e) {
+  console.log("No Permissions file found, setting default permissions. " + e);
   Permissions.global = {};
   Permissions.users = {};
 }
@@ -92,8 +88,7 @@ Permissions.checkPermission = function (user, permission) {
 
 bot.on("ready", function () {
   //console.log(bot.channels.get(lobby));
-
-  console.log("Logged in! Serving in " + bot.guilds.array().length + " servers");
+  console.log("Logged in! Serving in " + bot.guilds.resolve(channels.server).name);
   bot.user.setStatus("online");
 
   schedule.scheduleJob({hour: 18, minute: 0}, () => {
@@ -103,28 +98,15 @@ bot.on("ready", function () {
 });
 
 bot.on("disconnected", function () {
-
   console.log("Disconnected!");
   process.exit(1); //exit node.js with an error
-
 });
 
 bot.on('guildMemberAdd', function (user) {
-  user.sendMessage("Greetings again capsuleer, do not be alarmed.\n\n" +
-    "I, Aura, have interfaced with the FEDUP Discord Network, and can continue to assist you from inside the Discord client.\n\n" +
-
-    "But first, we must register you with the FEDUP Discord Network.\n\n" +
-
-    "Step 1: Go to http://services.jerkasauruswrecks.com:3000 and log in.\n" +
-    "Step 2: Return here with your registration code and tell me !register <your code>. Your code is unique to you, case sensitive, and should start with 'Dis: '\n" +
-    "Step 3: Once I have verified your registration is complete, you can validate your account on Discord with the !validate command.\n\n" +
-
-    "If you are looking to apply to FEDUP\n\n" +
-
-    "Step 4: Talk to a recruiter in the public-lobby. You can do so by typing @Recruiter to get their attention.");
+  user.sendMessage(require("./welcomemessage.js"));
 });
 
-bot.on('message', function (msg) {
+bot.on('message', msg => {
   //console.log(msg);
 
   console.log(msg.channel && msg.channel.id ? msg.channel.id : "No Channel Id");
@@ -252,8 +234,9 @@ function checkMessageForCommand(msg, isEdit) {
       return;
     }
 
-    if (msg.author != bot.user && msg.isMentioned(bot.user)) {
-      msg.author.sendMessage(msg.author + ", you called?");
+    if (msg.author != bot.user && msg.mentions.has(bot.user)) {
+      msg.author.send(require("./welcomemessage.js"));
+        //msg.author.username + ", you called?");
     } else {
 
     }
