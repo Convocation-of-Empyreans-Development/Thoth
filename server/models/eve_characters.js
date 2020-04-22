@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('eve_characters', {
+  var eve_characters = sequelize.define('eve_characters', {
     character_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -55,7 +55,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     }
-  }, {
+  },{
+    classMethods: {
+      associate: function(models) {
+        Users.belongsTo(models.aider_users);
+      }
+    }
+  },
+  {
     tableName: 'eve_characters'
   });
+
+  return eve_characters;
 };

@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('aider_users', {
+  var aider_users = sequelize.define('aider_users', {
     user_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -18,9 +18,23 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       unique: true
     }
-  }, {
+  },
+  {
     tableName: 'aider_users'
-  },{
+  },
+  {
     timestamps: false
-});
+  },
+  {
+    classMethods: {
+      associate: function(models) {
+        aider_users.belongsTo(models.eve_characters);
+      }
+    }
+  });
+
+  aider_users.associate = function(models){
+    aider_users.belongsTo(models.eve_characters, {foreignKey:'main_id', sourceKey: 'character_id'});
+  }
+  return aider_users;
 };

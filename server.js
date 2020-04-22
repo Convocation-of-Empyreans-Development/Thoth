@@ -3,6 +3,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var db = require('./server/database/database');
 var models = require("./server/models");
+var bot = require("./server/bot/bot.js");
 
 process.env.SECRET = "The darkness shall swallow the land, and in its wake there will follow a storm"
 var port = process.env.PORT || 3010;
@@ -80,8 +81,8 @@ models.sequelize.authenticate().then(function(){
 	});
 	app.listen(port, function(){
 		console.log("It works!");
-
-		//console.log(models);
+		bot.initialize(models);
+		//console.log(bot);
 		//models.query("SELECT * FROM aider_permission").success(function(myTableRows) {
 
 //})
