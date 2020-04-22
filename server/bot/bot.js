@@ -1,7 +1,7 @@
 var Discord = require("discord.js");
 var fs = require('fs'); //filesystem
 var bot = new Discord.Client;
-var AuthDetails = require("./auth.json");
+var AuthDetails = require("../../secret/discordSecret.json");
 
 
 var corporations = require('./corporations.js');

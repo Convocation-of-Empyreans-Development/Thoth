@@ -15,7 +15,7 @@ var commands = {
     description: "sets bot status to idle",
     process: function (bot, msg, models, suffix) {
       bot.user.setStatus("idle");
-      bot.user.setGame(suffix);
+      //bot.user.setGame(suffix);
     }
   },
   "online": {
