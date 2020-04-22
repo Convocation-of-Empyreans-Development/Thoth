@@ -161,12 +161,13 @@ var commands = {
         }]
       }).then(function (user) {
         if (user && user.dataValues) {
-            msg.author.send(JSON.stringify(user.dataValues));
+          user.dataValues.aider_roles.forEach((item, i) => {
+            msg.author.send(JSON.stringify(item));
+          });
         }
         else {
           msg.author.send("Not Found!");
         }
-        console.log(user);
       }).catch(error => {console.log(error.message)});
 
       //msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
