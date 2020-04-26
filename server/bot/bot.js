@@ -1,8 +1,6 @@
 var Discord = require("discord.js");
 var fs = require('fs'); //filesystem
 var bot = new Discord.Client;
-var AuthDetails = require("../../secret/discordSecret.json");
-
 
 var corporations = require('./corporations.js');
 
@@ -474,7 +472,14 @@ var initialize = (db) => {
       });
       console.log("Syncing Roles complete");
   });
-  bot.login(AuthDetails.bot_token);
+
+  // if being run in Github Actions, we pass the token in as an environment variable..
+  if (process.env.GITHUB_ACTIONS) {
+    bot.login(process.env.DISCORD_BOT_TOKEN);
+  } else {
+    var AuthDetails = require("../../secret/discordSecret.json");
+    bot.login(AuthDetails.bot_token);
+  }
 }
 
 module.exports.initialize = initialize;
