@@ -1,3 +1,5 @@
+var roles = require('./roles.js');
+
 var findAiderRoleByID = function(guild, models, id, callback){
     models.aider_roles.findOne({where: {role_name: guild.roles.resolve(id).name}}).then(function(role) {
       callback(role);
@@ -28,6 +30,7 @@ function getName(member){
 
 function validate(guild, models, bot, member) {
   console.log("Validating... " + getName(member));
+  // Step 1: pull user on server w/ rolls
   models.aider_users.findOne({where:{discord_id: member.id}, include:[{
     model: models.aider_roles,
     throguh: {
@@ -37,27 +40,56 @@ function validate(guild, models, bot, member) {
     }
   }]}).then( function(user){
     if(user){
+      //Validate that all server roles are correctly applied
       console.log(getName(member));
       console.log("User ID " + user.user_id);
-      //console.log(user.aider_roles);
-      console.log('Server roles');
-      user.aider_roles.forEach((item, i) => {
-        console.log(item.role_name);
-      });
-      console.log('Discord Roles: ');
 
-      member.roles.cache.forEach((item, i) => {
-        findAiderRoleByID(guild, models, item.id, aider_role => {
-          if(aider_role){
-            console.log(aider_role.role_name + " " + item.id);
-          } else {
-            console.log(item.name);
+      var aider_roles = {};
+
+      // Step 2: Add any roles that are not
+      user.aider_roles.forEach((item, i) => {
+        aider_roles[item.role_name] = item;
+        console.log(item.role_name);
+        findDiscordRoleByAiderRole(guild, item, discordRole => {
+          if(discordRole){
+            member.roles.add(discordRole);
+            //console.log(discordRole);
           }
         });
       });
 
+      // Step 3: Go over roles to validate still good
+      //console.log(user.aider_roles);
+      member.roles.cache.forEach((discordRole, i) => {
+        findAiderRoleByID(guild, models, discordRole.id, aider_role => {
+          if(!aider_role || aider_roles[aider_role.role_name]){
+            return;
+          }
+          console.log(discordRole.name + " not assigned! Removing...");
+          member.roles.remove(discordRole);
+          console.log(discordRole.name + " removed");
+
+
+          /*if(aider_role){
+            console.log(aider_role.role_name);
+          } else if(roles.includes(item.name)) {
+            console.log("Override: " + item.name);
+          }
+          else {
+            console.log("Not found " + item.name);
+          }*/
+
+
+          /*if(aider_role){
+            console.log(aider_role.role_name + " " + item.id);
+          } else {
+            console.log(item.name);
+          }*/
+        });
+      });
+
     } else {
-      //console.log(getName(member) + ' not found');
+      console.log(getName(member) + ' not found');
     }
   }).catch(error => {console.log(error.message)});
 }

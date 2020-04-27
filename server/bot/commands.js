@@ -19,7 +19,6 @@ var commands = {
           bot.guilds.cache.forEach((guild, i) => {
             console.log("\nLogged in! Serving in " + bot.guilds.resolve(guild).name);
             console.log("Syncing Roles for " + bot.guilds.resolve(guild).name + "\n");
-
             aiderRoles.forEach((aiderRole, i) => {
               if(aiderRole.applies_to_discord){
                 botUtils.findDiscordRoleByAiderRole(guild, aiderRole, result => {
@@ -314,143 +313,17 @@ var commands = {
     usage: "<User>",
     description: 'Registers your EVE account using your Discord Code',
     process: function (bot, msg, models, suffix) {
-      console.log("Starting looking");
       var args = suffix.split(' ');
       var userToFind = args.shift();
       var message = args.join(' ');
 
-      console.log("!@#$@#");
-      console.log(userToFind);
-      console.log("!@#$@#");
       if (userToFind.startsWith('<@')) {
         userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
       } else {
         userToFind = msg.author.id
       }
-
-      console.log(userToFind);
-      var target = msg.channel.guild.members.get(userToFind);
-      if (!target) {
-        target = msg.channel.guild.members.find("username", userToFind);
-      }
-
-      //console.log("Target id: " + target.id);
-      if (target && target.id) {
-        models.user.findOne({
-          where: {discord_id: target.id}
-        }).then(function (user) {
-          //console.log("HIT IT " + user.dataValues.name);
-          if (user && user.dataValues) {
-            refreshToken(user, function (token) {
-              console.log(token);
-              eveonlinejs.setParams({
-                accessToken: token.access_token,
-                accessType: "Character"
-              });
-              eveonlinejs.fetch('char:FacWarStats', {characterID: user.char_id}, function (err, result) {
-                if (err) console.log(err)
-                if (err && err.response && err.response.statusCode == 400) {
-                  msg.author.send(user.dataValues.name + " is not a member of Faction Warfare.");
-                  console.log(msg.channel.guild.roles.find("name", "Militia"))
-                  target.removeRole(msg.channel.guild.roles.find("name", "Militia")).then(function () {
-                    console.log("DONE");
-                  }).catch(function (err) {
-                    console.log(err);
-                  });
-                } else {
-                  console.log(result.factionName);
-                  var messageEnd = result.factionName == "Gallente Federation" ? " adding them to the militia." : " enemy Milita";
-
-
-                  msg.author.send(user.dataValues.name + " is a member of the " + result.factionName + "" + messageEnd);
-
-                  if (result.factionName == "Gallente Federation") {
-                    target.addRole(msg.channel.guild.roles.find("name", "Militia")).then(function () {
-                      console.log("DONE militia");
-                    }).catch(function (err) {
-                      console.log(err);
-                    });
-                  }
-                }
-
-                console.log("FOO");
-              });
-            });
-
-            //console.log(user.dataValues);
-            var headers = {
-              "Content-Type": "application/json",
-            }
-
-            var options = {
-              url: 'https://esi.tech.ccp.is/latest/characters/' + user.char_id + '/?datasource=tranquility',
-              method: 'GET',
-              headers: headers,
-            }
-            request(options, function (error, response, body) {
-              var character = JSON.parse(body);
-              options.url = 'https://esi.tech.ccp.is/latest/corporations/' + character.corporation_id + '/?datasource=tranquility'
-              request(options, function (error, response, body) {
-                var corporation = JSON.parse(body);
-                corp = corporations.searchByName(corporation.corporation_name);
-                console.log(corp);
-                if (corp) {
-                  msg.author.send(character.name + "'s corporation is " + corp.name + " " + corp.tag + " tag approved.");
-                  target.addRole(msg.channel.guild.roles.find("name", corp.tag)).then(function () {
-
-                    console.log("DONE");
-                  }).catch(function (err) {
-                    console.log(err);
-                  });
-                } else {
-                  msg.author.send(character.name + "'s corporation is " + corporation.corporation_name + " FEDUP corp membership denied.");
-                }
-
-                console.log("ALLIANCE ID: " + corporation.alliance_id);
-
-                options.url = 'https://esi.tech.ccp.is/latest/alliances/' + corporation.alliance_id + '/?datasource=tranquility'
-                request(options, function (error, response, body) {
-
-                  var alliance = JSON.parse(body);
-                  //msg.author.send(character.name +"'s Alliance is " + alliance.alliance_name + " member tag approved");
-
-                  if (alliance.alliance_name == 'Federation Uprising') {
-                    msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " member tag approved");
-                    target.addRole(msg.channel.guild.roles.find("name", "Member")).then(function () {
-                      console.log("DONE");
-                    }).catch(function (err) {
-                      console.log(err);
-                    });
-                  } else if (alliance.alliance_name == 'Pen Is Out') {
-                    msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " WANGS tag approved");
-                    target.addRole(msg.channel.guild.roles.find("name", "WANGS")).then(function () {
-                      console.log("DONE");
-                    }).catch(function (err) {
-                      console.log(err);
-                    });
-                  } else {
-                    target.removeRole(msg.channel.guild.roles.find("name", "Member")).then(function () {
-                      console.log("DONE");
-                    }).catch(function (err) {
-                      console.log(err);
-                    });
-
-                    msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " member tag denied.");
-                    //msg.author.removeFrom(msg.channel.guild.roles.find("name", "Member"), null);
-                  }
-                });
-
-              });
-            });
-          } else {
-            msg.author.send("User is not registered yet. Visit http://services.jerkasauruswrecks.com:3000/ to register");
-          }
-        });
-      } else {
-
-        msg.author.send("No ID Found! Maybe you need to register. Visit http://services.jerkasauruswrecks.com:3000/ to register");
-      }
-
+      console.log(msg.guild.members.resolve(userToFind));
+      botUtils.validate(msg.guild, models, bot, msg.guild.members.resolve(userToFind));
     }
   },
   "channels": {
@@ -668,3 +541,144 @@ var commands = {
 
 
 module.exports = commands;
+/*
+process: function (bot, msg, models, suffix) {
+  console.log("Starting looking");
+  var args = suffix.split(' ');
+  var userToFind = args.shift();
+  var message = args.join(' ');
+
+  console.log("!@#$@#");
+  console.log(userToFind);
+  console.log("!@#$@#");
+  if (userToFind.startsWith('<@')) {
+    userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
+  } else {
+    userToFind = msg.author.id
+  }
+
+  console.log(userToFind);
+  var target = msg.channel.guild.members.get(userToFind);
+  if (!target) {
+    target = msg.channel.guild.members.find("username", userToFind);
+  }
+
+  //console.log("Target id: " + target.id);
+  if (target && target.id) {
+    models.user.findOne({
+      where: {discord_id: target.id}
+    }).then(function (user) {
+      //console.log("HIT IT " + user.dataValues.name);
+      if (user && user.dataValues) {
+        refreshToken(user, function (token) {
+          console.log(token);
+          eveonlinejs.setParams({
+            accessToken: token.access_token,
+            accessType: "Character"
+          });
+          eveonlinejs.fetch('char:FacWarStats', {characterID: user.char_id}, function (err, result) {
+            if (err) console.log(err)
+            if (err && err.response && err.response.statusCode == 400) {
+              msg.author.send(user.dataValues.name + " is not a member of Faction Warfare.");
+              console.log(msg.channel.guild.roles.find("name", "Militia"))
+              target.removeRole(msg.channel.guild.roles.find("name", "Militia")).then(function () {
+                console.log("DONE");
+              }).catch(function (err) {
+                console.log(err);
+              });
+            } else {
+              console.log(result.factionName);
+              var messageEnd = result.factionName == "Gallente Federation" ? " adding them to the militia." : " enemy Milita";
+
+
+              msg.author.send(user.dataValues.name + " is a member of the " + result.factionName + "" + messageEnd);
+
+              if (result.factionName == "Gallente Federation") {
+                target.addRole(msg.channel.guild.roles.find("name", "Militia")).then(function () {
+                  console.log("DONE militia");
+                }).catch(function (err) {
+                  console.log(err);
+                });
+              }
+            }
+
+            console.log("FOO");
+          });
+        });
+
+        //console.log(user.dataValues);
+        var headers = {
+          "Content-Type": "application/json",
+        }
+
+        var options = {
+          url: 'https://esi.tech.ccp.is/latest/characters/' + user.char_id + '/?datasource=tranquility',
+          method: 'GET',
+          headers: headers,
+        }
+        request(options, function (error, response, body) {
+          var character = JSON.parse(body);
+          options.url = 'https://esi.tech.ccp.is/latest/corporations/' + character.corporation_id + '/?datasource=tranquility'
+          request(options, function (error, response, body) {
+            var corporation = JSON.parse(body);
+            corp = corporations.searchByName(corporation.corporation_name);
+            console.log(corp);
+            if (corp) {
+              msg.author.send(character.name + "'s corporation is " + corp.name + " " + corp.tag + " tag approved.");
+              target.addRole(msg.channel.guild.roles.find("name", corp.tag)).then(function () {
+
+                console.log("DONE");
+              }).catch(function (err) {
+                console.log(err);
+              });
+            } else {
+              msg.author.send(character.name + "'s corporation is " + corporation.corporation_name + " FEDUP corp membership denied.");
+            }
+
+            console.log("ALLIANCE ID: " + corporation.alliance_id);
+
+            options.url = 'https://esi.tech.ccp.is/latest/alliances/' + corporation.alliance_id + '/?datasource=tranquility'
+            request(options, function (error, response, body) {
+
+              var alliance = JSON.parse(body);
+              //msg.author.send(character.name +"'s Alliance is " + alliance.alliance_name + " member tag approved");
+
+              if (alliance.alliance_name == 'Federation Uprising') {
+                msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " member tag approved");
+                target.addRole(msg.channel.guild.roles.find("name", "Member")).then(function () {
+                  console.log("DONE");
+                }).catch(function (err) {
+                  console.log(err);
+                });
+              } else if (alliance.alliance_name == 'Pen Is Out') {
+                msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " WANGS tag approved");
+                target.addRole(msg.channel.guild.roles.find("name", "WANGS")).then(function () {
+                  console.log("DONE");
+                }).catch(function (err) {
+                  console.log(err);
+                });
+              } else {
+                target.removeRole(msg.channel.guild.roles.find("name", "Member")).then(function () {
+                  console.log("DONE");
+                }).catch(function (err) {
+                  console.log(err);
+                });
+
+                msg.author.send(character.name + "'s Alliance is " + alliance.alliance_name + " member tag denied.");
+                //msg.author.removeFrom(msg.channel.guild.roles.find("name", "Member"), null);
+              }
+            });
+
+          });
+        });
+      } else {
+        msg.author.send("User is not registered yet. Visit http://services.jerkasauruswrecks.com:3000/ to register");
+      }
+    });
+  } else {
+
+    msg.author.send("No ID Found! Maybe you need to register. Visit http://services.jerkasauruswrecks.com:3000/ to register");
+  }
+
+}
+*/

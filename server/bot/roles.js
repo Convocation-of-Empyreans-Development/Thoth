@@ -1,4 +1,18 @@
-roles = {[
+roles = [
+  'Zapier',
+  'Voice Active Allowed',
+  '@everyone',
+  'Thoth',
+  'MALRO-Bot',
+  'Nitro Booster',
+  'Faction Warfare',
+  'Staff',
+  'Supporter',
+  'Guests',
+  'Aiderbot',
+]
+
+  /*
   {
     name: "Directorate",
     protected: 4,
@@ -86,4 +100,4 @@ roles = {[
 
 }*/
 
-modual.exports = roles;
+module.exports = roles;
