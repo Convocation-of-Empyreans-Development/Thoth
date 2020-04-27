@@ -193,8 +193,9 @@ var commands = {
       } else {
         userToFind = msg.author.id
       }
-
       console.log(msg.guild.members.resolve(userToFind));
+      botUtils.validate(msg.guild, models, bot, msg.guild.members.resolve(userToFind));
+
 
       //botUtils.massValidate(msg.guild, models, bot)
       /*models.aider_users.findOne({

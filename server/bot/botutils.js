@@ -27,6 +27,7 @@ function getName(member){
 }
 
 function validate(guild, models, bot, member) {
+  console.log("Validating... " + getName(member));
   models.aider_users.findOne({where:{discord_id: member.id}, include:[{
     model: models.aider_roles,
     throguh: {
@@ -39,14 +40,21 @@ function validate(guild, models, bot, member) {
       console.log(getName(member));
       console.log("User ID " + user.user_id);
       //console.log(user.aider_roles);
+      console.log('Server roles');
       user.aider_roles.forEach((item, i) => {
         console.log(item.role_name);
       });
-      member.permissions.cache.forEach((item, i) => {
-        console.log(item.name);
+      console.log('Discord Roles: ');
+
+      member.roles.cache.forEach((item, i) => {
+        findAiderRoleByID(guild, models, item.id, aider_role => {
+          if(aider_role){
+            console.log(aider_role.role_name + " " + item.id);
+          } else {
+            console.log(item.name);
+          }
+        });
       });
-
-
 
     } else {
       //console.log(getName(member) + ' not found');
@@ -248,3 +256,4 @@ function massValidate (guild, models, bot) {
 module.exports.findAiderRoleByID = findAiderRoleByID;
 module.exports.findDiscordRoleByAiderRole = findDiscordRoleByAiderRole;
 module.exports.massValidate = massValidate;
+module.exports.validate = validate;
