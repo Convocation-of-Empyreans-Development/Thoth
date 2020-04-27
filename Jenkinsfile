@@ -13,6 +13,9 @@ pipeline {
       }
     }
     stage('run-bot') {
+      environment {
+           DISCORD_BOT_TOKEN = credentials('discord_bot_token')
+      }
       steps {
         sh 'node ./server.js'
       }
