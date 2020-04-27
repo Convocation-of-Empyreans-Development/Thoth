@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "storeFacWarSystems": "node server/fwRunner.js"
+    "storeFacWarSystems": "node server/fwRunner.js",
+    "test": "mocha --exit"
   },
   "author": "Ashterothi",
   "license": "ISC",
