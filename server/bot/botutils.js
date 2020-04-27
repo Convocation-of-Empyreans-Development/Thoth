@@ -96,11 +96,11 @@ function validate(guild, models, bot, member) {
 
 function massValidate (guild, models, bot) {
 
-  console.log("Mass Validate for " + guild.name);
+  /*console.log("Mass Validate for " + guild.name);
   guild.members.cache.forEach((member, i) => {
     console.log('Validating... ' + getName(member));
     validate(guild, models, bot, member);
-  });
+  });*/
 
 
   //guild.fetchMembers().then(function (guild) {
