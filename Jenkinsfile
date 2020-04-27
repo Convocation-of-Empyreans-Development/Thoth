@@ -18,7 +18,7 @@ pipeline {
            JENKINS_BUILD     = true
       }
       steps {
-        sh 'node ./server.js'
+        sh 'npm test'
       }
     }
   }
