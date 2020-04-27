@@ -430,7 +430,7 @@ var initialize = (db) => {
   });
 
   // if being run in Github Actions, we pass the token in as an environment variable..
-  if (process.env.GITHUB_ACTIONS) {
+  if (process.env.GITHUB_ACTIONS || process.env.JENKINS_BUILD) {
     bot.login(process.env.DISCORD_BOT_TOKEN);
   } else {
     var AuthDetails = require("../../secret/discordSecret.json");
