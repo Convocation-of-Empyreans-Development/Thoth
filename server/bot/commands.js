@@ -101,15 +101,11 @@ var commands = {
       msg.author.send("message saved.")
     }
   },
-  "eval": {
-    usage: "<command>",
-    description: 'Executes arbitrary javascript in the bot process. User must have "eval" permission',
+  "welcome": {
+    description: 'Sends you the Discord Welcome Message',
     process: function (bot, msg, models, suffix) {
-      if (Permissions.checkPermission(msg.author, "eval")) {
-        msg.author.send(eval(suffix, bot));
-      } else {
-        msg.author.send(msg.author + " doesn't have permission to execute eval!");
-      }
+      var welcomeMessage = require('./welcomeMessage.js');
+      msg.author.send(welcomeMessage);
     }
   },
   "id": {
@@ -188,7 +184,20 @@ var commands = {
   "testfoo": {
     description: 'testfoo',
     process: function (bot, msg, models, suffix) {
-      models.aider_users.findOne({
+      var args = suffix.split(' ');
+      var userToFind = args.shift();
+      var message = args.join(' ');
+
+      if (userToFind.startsWith('<@')) {
+        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
+      } else {
+        userToFind = msg.author.id
+      }
+
+      console.log(msg.guild.members.resolve(userToFind));
+
+      //botUtils.massValidate(msg.guild, models, bot)
+      /*models.aider_users.findOne({
         where: {discord_id: msg.author.id},
         include:[{
           model: models.aider_roles,
@@ -208,7 +217,7 @@ var commands = {
           msg.author.send("Not Found!");
         }
       }).catch(error => {console.log(error.message)});
-
+*/
       //msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
     }
   },
