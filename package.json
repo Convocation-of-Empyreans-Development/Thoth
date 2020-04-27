@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "storeFacWarSystems": "node server/fwRunner.js"
+    "storeFacWarSystems": "node server/fwRunner.js",
+    "test": "mocha --exit"
   },
   "author": "Ashterothi",
   "license": "ISC",
@@ -16,6 +17,7 @@
     "express": "^4.14.0",
     "jsonwebtoken": "^8",
     "lodash": "^4.17.4",
+    "mocha": "^7.1.2",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.11",
     "mysql": "^2.18.1",
