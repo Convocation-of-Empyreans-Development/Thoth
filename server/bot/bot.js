@@ -1,6 +1,8 @@
 var Discord = require("discord.js");
 var fs = require('fs'); //filesystem
 var bot = new Discord.Client;
+var botUtils = require('./botutils.js');
+
 
 var corporations = require('./corporations.js');
 
@@ -23,7 +25,6 @@ var roles = {};
 var models = {};
 var discord = {};
 
-
 try {
   Config = require("./config.json");
 } catch (e) { //no config file, use defaults
@@ -43,53 +44,12 @@ if (!Config.hasOwnProperty("commandPrefix")) {
   Config.commandPrefix = '!';
 }
 
-
-// load permissions
-var dangerousCommands = []//"eval","pullanddeploy","setUsername"];
-var Permissions = {};
-try {
-  Permissions = require("./permissions.js");
-} catch (e) {
-  console.log("No Permissions file found, setting default permissions. " + e);
-  Permissions.global = {};
-  Permissions.users = {};
-}
-for (var i = 0; i < dangerousCommands.length; i++) {
-  var cmd = dangerousCommands[i];
-  if (!Permissions.global.hasOwnProperty(cmd)) {
-    Permissions.global[cmd] = false;
-  }
-}
-Permissions.checkPermission = function (user, permission) {
-  /*try {
-   var allowed = true;
-   try{
-   if(Permissions.global.hasOwnProperty(permission)){
-   allowed = Permissions.global[permission] === true;
-   }
-   } catch(e){}
-   try{
-   if(Permissions.users[user.id].hasOwnProperty(permission)){
-   allowed = Permissions.users[user.id][permission] === true;
-   }
-   } catch(e){}
-   return allowed;
-   } catch(e){}
-   return false;*/
-  return true;
-}
-//fs.writeFile("./permissions.json", JSON.stringify(Permissions, null, 2));
-
 bot.on("ready", function () {
-  //console.log(bot.channels.get(lobby));
-  console.log("Logged in! Serving in " + bot.guilds.resolve(channels.server).name);
   bot.user.setStatus("online");
-  //console.log(JSON.stringify(models.aider_roles));
-  //models.aider_roles.find().then(function(roles){ JSON.stringify(roles)});
 
   schedule.scheduleJob({hour: 18, minute: 0}, () => {
-    console.log('Running mass validate');
-    massValidate(bot);
+    console.log('Running mass validate NOT IMPLIMENTED');
+    //massValidate(bot);
   });
 });
 
@@ -103,32 +63,30 @@ bot.on('guildMemberAdd', function (user) {
 });
 
 bot.on('message', msg => {
-  //console.log(msg);
-
-  console.log(msg.channel && msg.channel.id ? msg.channel.id : "No Channel Id");
-  console.log(msg.member && msg.member.user ? msg.member.user : "No User");
+  //console.log(msg.channel && msg.channel.id ? msg.channel.id : "No Channel Id");
+  //console.log(msg.member && msg.member.user ? msg.member.user : "No User");
 
   if (msg.member) {
-    // no member means the channel is a DM
 
   }
   if (msg.member && msg.member.user.id != 265177397161099276) {
-
-    //msg.author.send(msg.member.user.id);
-
   }
+
   checkMessageForCommand(msg);
 });
 
 bot.sendMessage = function (channel, message) {
-  console.log(message);
+  //console.log(message);
   bot.channels.get(bot_testing).send(message);
 }
 
 function checkMessageForCommand(msg, isEdit) {
-	console.log(msg.content.length);
+	//console.log(msg.content.length);
   //check if message is a command
-  if (msg.author.id != bot.user.id && (msg.content.startsWith(Config.commandPrefix)) && msg.content.length > 1) {
+  if (msg.author.id != bot.user.id
+    && (msg.content.startsWith(Config.commandPrefix))
+    && msg.content.length > 1
+    && msg.channel.name == 'bot-commands') {
     console.log("treating " + msg.content + " from " + msg.author + " as command");
     var cmdTxt = msg.content.split(" ")[0].substring(Config.commandPrefix.length);
     var suffix = msg.content.substring(cmdTxt.length + Config.commandPrefix.length + 1); //add one for the ! and one for the space
@@ -200,7 +158,7 @@ function checkMessageForCommand(msg, isEdit) {
       }
     }
     else if (cmd) {
-      if (Permissions.checkPermission(msg.author, cmdTxt)) {
+
         try {
           cmd.process(bot, msg, models, suffix, isEdit);
         } catch (e) {
@@ -211,21 +169,19 @@ function checkMessageForCommand(msg, isEdit) {
           }
           msg.author.send(msgTxt);
         }
-      } else {
-        msg.author.send("You are not allowed to run " + cmdTxt + "!");
-      }
+
     } else {
       msg.author.send(cmdTxt + " not recognized as a command!").then((message => message.delete(5000)))
     }
-  } else {
-
+  } else if(msg.author == bot.user || !msg.content.startsWith(Config.commandPrefix)){
     //message isn't a command or is from us
     //drop our own messages to prevent feedback loops
-    if (msg.author == bot.user) {
-      return;
-    }
-
-    if (msg.author != bot.user && msg.mentions.has(bot.user)) {
+    return;
+  }
+  else if(msg.channel.name != 'bot-commands'){
+    msg.channel.send("You must use the #bot-commands channel.");
+  } else {
+    if (msg.author != bot.user && msg.mentions.has(bot.user) && !msg.mentions.everyone) {
       msg.author.send(msg.author.username + ", you called?");
     } else {
 
@@ -274,8 +230,8 @@ var refreshToken = function (user, callback, errCallback) {
   });
 }
 
-function massValidate (bot) {
-  var corpRolesMap = {
+function massValidate (guild, bot) {
+  /*var corpRolesMap = {
     "Aideron Robotics": "AIDER",
     "Mecha Enterprises Fleet": "XMETA",
     "Jerkasaurus Wrecks Inc.": "JREX",
@@ -288,11 +244,11 @@ function massValidate (bot) {
   var allianceRolesMap = {
     "Federation Uprising": "Member",
     "Pen Is Out": "WANGS"
-  };
+  };*/
 
-  var automaticallyAssignedRoles = ["Militia"].concat(_.values(corpRolesMap)).concat(_.values(allianceRolesMap));
+  //var automaticallyAssignedRoles = ["Militia"].concat(_.values(corpRolesMap)).concat(_.values(allianceRolesMap));
 
-  bot.guilds.first().fetchMembers().then(function (guild) {
+  guild.fetchMembers().then(function (guild) {
     models.user.findAll().then(function (users) {
       users = _.filter(users, user => {
         return user.discord_id != null && user.discord_id.substr(0, 4) !== "Dis:";
@@ -482,4 +438,45 @@ var initialize = (db) => {
   }
 }
 
+
+
+
 module.exports.initialize = initialize;
+
+
+// load permissions
+//var dangerousCommands = []//"eval","pullanddeploy","setUsername"];
+/*var Permissions = {};
+try {
+  Permissions = require("./permissions.js");
+} catch (e) {
+  console.log("No Permissions file found, setting default permissions. " + e);
+  Permissions.global = {};
+  Permissions.users = {};
+}
+for (var i = 0; i < dangerousCommands.length; i++) {
+  var cmd = dangerousCommands[i];
+  if (!Permissions.global.hasOwnProperty(cmd)) {
+    Permissions.global[cmd] = false;
+  }
+}
+Permissions.checkPermission = function (user, permission) {
+  /*try {
+   var allowed = true;
+   try{
+   if(Permissions.global.hasOwnProperty(permission)){
+   allowed = Permissions.global[permission] === true;
+   }
+   } catch(e){}
+   try{
+   if(Permissions.users[user.id].hasOwnProperty(permission)){
+   allowed = Permissions.users[user.id][permission] === true;
+   }
+   } catch(e){}
+   return allowed;
+   } catch(e){}
+   return false;
+  return true;
+}
+//fs.writeFile("./permissions.json", JSON.stringify(Permissions, null, 2));
+*/

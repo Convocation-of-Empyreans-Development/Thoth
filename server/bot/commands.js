@@ -1,4 +1,5 @@
 var joinableChannels = require('./joinableChannels.js');
+var botUtils = require('./botutils.js');
 
 var commands = {
   "ping": {
@@ -8,6 +9,44 @@ var commands = {
       if (suffix) {
         msg.author.send("note that !ping takes no arguments!");
       }
+    }
+  },
+  "roleverification": {
+    description: "verifies the servers roles vs managed roles",
+    process: function (bot, msg, models, suffix){
+      models.aider_roles.findAll().then(aiderRoles =>
+      {
+          bot.guilds.cache.forEach((guild, i) => {
+            console.log("\nLogged in! Serving in " + bot.guilds.resolve(guild).name);
+            console.log("Syncing Roles for " + bot.guilds.resolve(guild).name + "\n");
+
+            aiderRoles.forEach((aiderRole, i) => {
+              if(aiderRole.applies_to_discord){
+                botUtils.findDiscordRoleByAiderRole(guild, aiderRole, result => {
+                  if(result){
+                    console.log("Found: " + result.name + " " + result.id);
+                  } else {
+                    console.log("Cannot find " + aiderRole.role_name + " among " + guild.name + "'s roles");
+                  }
+                });
+              } else{
+                console.log('not included ' + aiderRole.role_name);
+              }
+            });
+            guild.roles.cache.forEach((item, i) => {
+                botUtils.findAiderRoleByID(guild, models, item.id, result => {
+                  if(result){
+                    //console.log(result.role_name);
+                  } else{
+                    console.log(item.name + " not found " + guild.name);
+                  }
+                });
+            });
+
+
+            console.log("Syncing Roles complete " + bot.guilds.resolve(guild).name + "\n\n\n\n");
+          });
+      });
     }
   },
   "idle": {
@@ -62,15 +101,11 @@ var commands = {
       msg.author.send("message saved.")
     }
   },
-  "eval": {
-    usage: "<command>",
-    description: 'Executes arbitrary javascript in the bot process. User must have "eval" permission',
+  "welcome": {
+    description: 'Sends you the Discord Welcome Message',
     process: function (bot, msg, models, suffix) {
-      if (Permissions.checkPermission(msg.author, "eval")) {
-        msg.author.send(eval(suffix, bot));
-      } else {
-        msg.author.send(msg.author + " doesn't have permission to execute eval!");
-      }
+      var welcomeMessage = require('./welcomeMessage.js');
+      msg.author.send(welcomeMessage);
     }
   },
   "id": {
@@ -149,7 +184,20 @@ var commands = {
   "testfoo": {
     description: 'testfoo',
     process: function (bot, msg, models, suffix) {
-      models.aider_users.findOne({
+      var args = suffix.split(' ');
+      var userToFind = args.shift();
+      var message = args.join(' ');
+
+      if (userToFind.startsWith('<@')) {
+        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
+      } else {
+        userToFind = msg.author.id
+      }
+
+      console.log(msg.guild.members.resolve(userToFind));
+
+      //botUtils.massValidate(msg.guild, models, bot)
+      /*models.aider_users.findOne({
         where: {discord_id: msg.author.id},
         include:[{
           model: models.aider_roles,
@@ -169,7 +217,7 @@ var commands = {
           msg.author.send("Not Found!");
         }
       }).catch(error => {console.log(error.message)});
-
+*/
       //msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
     }
   },
