@@ -1,4 +1,5 @@
 var joinableChannels = require('./joinableChannels.js');
+var botUtils = require('./botutils.js');
 
 var commands = {
   "ping": {
@@ -8,6 +9,44 @@ var commands = {
       if (suffix) {
         msg.author.send("note that !ping takes no arguments!");
       }
+    }
+  },
+  "roleverification": {
+    description: "verifies the servers roles vs managed roles",
+    process: function (bot, msg, models, suffix){
+      models.aider_roles.findAll().then(aiderRoles =>
+      {
+          bot.guilds.cache.forEach((guild, i) => {
+            console.log("\nLogged in! Serving in " + bot.guilds.resolve(guild).name);
+            console.log("Syncing Roles for " + bot.guilds.resolve(guild).name + "\n");
+
+            aiderRoles.forEach((aiderRole, i) => {
+              if(aiderRole.applies_to_discord){
+                botUtils.findDiscordRoleByAiderRole(guild, aiderRole, result => {
+                  if(result){
+                    console.log("Found: " + result.name + " " + result.id);
+                  } else {
+                    console.log("Cannot find " + aiderRole.role_name + " among " + guild.name + "'s roles");
+                  }
+                });
+              } else{
+                console.log('not included ' + aiderRole.role_name);
+              }
+            });
+            guild.roles.cache.forEach((item, i) => {
+                botUtils.findAiderRoleByID(guild, models, item.id, result => {
+                  if(result){
+                    //console.log(result.role_name);
+                  } else{
+                    console.log(item.name + " not found " + guild.name);
+                  }
+                });
+            });
+
+
+            console.log("Syncing Roles complete " + bot.guilds.resolve(guild).name + "\n\n\n\n");
+          });
+      });
     }
   },
   "idle": {

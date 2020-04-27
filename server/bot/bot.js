@@ -1,6 +1,7 @@
 var Discord = require("discord.js");
 var fs = require('fs'); //filesystem
 var bot = new Discord.Client;
+var botUtils = require('./botutils.js');
 var AuthDetails = require("../../secret/discordSecret.json");
 
 
@@ -83,15 +84,11 @@ Permissions.checkPermission = function (user, permission) {
 //fs.writeFile("./permissions.json", JSON.stringify(Permissions, null, 2));
 
 bot.on("ready", function () {
-  //console.log(bot.channels.get(lobby));
-  console.log("Logged in! Serving in " + bot.guilds.resolve(channels.server).name);
   bot.user.setStatus("online");
-  //console.log(JSON.stringify(models.aider_roles));
-  //models.aider_roles.find().then(function(roles){ JSON.stringify(roles)});
 
   schedule.scheduleJob({hour: 18, minute: 0}, () => {
-    console.log('Running mass validate');
-    massValidate(bot);
+    console.log('Running mass validate NOT IMPLIMENTED');
+    //massValidate(bot);
   });
 });
 
@@ -227,7 +224,7 @@ function checkMessageForCommand(msg, isEdit) {
       return;
     }
 
-    if (msg.author != bot.user && msg.mentions.has(bot.user)) {
+    if (msg.author != bot.user && msg.mentions.has(bot.user) && !msg.mentions.everyone) {
       msg.author.send(msg.author.username + ", you called?");
     } else {
 
@@ -465,16 +462,10 @@ var CBot = {}
 var initialize = (db) => {
   console.log("Starting Discord Bot...");
   models = db;
-  //console.log(models);
-  models.aider_roles.findAll().then(roles =>
-  {
-      console.log("Syncing Roles - ");
-      roles.forEach((item, i) => {
-        console.log(item.role_name);
-      });
-      console.log("Syncing Roles complete");
-  });
   bot.login(AuthDetails.bot_token);
 }
+
+
+
 
 module.exports.initialize = initialize;
