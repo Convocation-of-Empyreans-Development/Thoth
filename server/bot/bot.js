@@ -80,6 +80,21 @@ bot.sendMessage = function (channel, message) {
   bot.channels.get(bot_testing).send(message);
 }
 
+/*bot.on("presenceUpdate", function(oldp, newp){
+
+  newp.activities.forEach((item, i) => {
+    console.log(item);
+  });
+
+
+  let streams = newp.activities.filter(e => e.type == "STREAMING");
+  if (streams.length > 0) {
+    let guild = bot.guilds.resolve(stream.guild);
+    let member = guild.member(stream.userID);
+    console.log(member);
+  }
+});*/
+
 function checkMessageForCommand(msg, isEdit) {
 	//console.log(msg.content.length);
   //check if message is a command

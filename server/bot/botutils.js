@@ -30,6 +30,9 @@ function getName(member){
 
 function validate(guild, models, bot, member) {
   console.log("Validating... " + getName(member));
+  console.log(member.user);
+  
+
   // Step 1: pull user on server w/ rolls
   models.aider_users.findOne({where:{discord_id: member.id}, include:[{
     model: models.aider_roles,

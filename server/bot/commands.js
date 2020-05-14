@@ -183,17 +183,18 @@ var commands = {
   "testfoo": {
     description: 'testfoo',
     process: function (bot, msg, models, suffix) {
-      var args = suffix.split(' ');
-      var userToFind = args.shift();
-      var message = args.join(' ');
+      msg.channel.send("https://cdn.discordapp.com/avatars/" + msg.author.id + "/" + msg.author.avatar + ".png")
+      models.aider_users.findAll({include:[
+        {model: models.eve_characters,
+          foreignKey:'main_id',
+          sourceKey: 'character_id'}]})
+        .then(users =>{
+          users.forEach((user, i) => {
+            console.log(user.dataValues.eve_character.dataValues.name);
+          });
 
-      if (userToFind.startsWith('<@')) {
-        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
-      } else {
-        userToFind = msg.author.id
-      }
-      console.log(msg.guild.members.resolve(userToFind));
-      botUtils.validate(msg.guild, models, bot, msg.guild.members.resolve(userToFind));
+
+        });
 
 
       //botUtils.massValidate(msg.guild, models, bot)
