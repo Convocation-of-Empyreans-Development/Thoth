@@ -68,36 +68,7 @@ var commands = {
     usage: "<message>",
     description: "bot says message",
     process: function (bot, msg, models, suffix) {
-      msg.author.send(suffix);
-    }
-  },
-  "announce": {
-    usage: "<message>",
-    description: "bot says message with text to speech",
-    process: function (bot, msg, models, suffix) {
-      msg.author.send(suffix, {tts: true});
-    }
-  },
-  "msg": {
-    usage: "<user> <message to leave user>",
-    description: "leaves a message for a user the next time they come online",
-    process: function (bot, msg, models, suffix) {
-      var args = suffix.split(' ');
-      var user = args.shift();
-      var message = args.join(' ');
-      if (user.startsWith('<@')) {
-        user = user.substr(2, user.length - 3);
-      }
-      var target = msg.channel.guild.members.find("id", user);
-      if (!target) {
-        target = msg.channel.guild.members.find("username", user);
-      }
-      messagebox[target.id] = {
-        channel: msg.author.id,
-        content: target + ", " + msg.author + " said: " + message
-      };
-      updateMessagebox();
-      msg.author.send("message saved.")
+      msg.channel.send(suffix);
     }
   },
   "welcome": {
@@ -110,33 +81,7 @@ var commands = {
   "id": {
     description: 'Tells you your discord id',
     process: function (bot, msg, models, suffix) {
-      if (Permissions.checkPermission(msg.author, "id")) {
-        msg.author.send("Your id is " + msg.author.id);
-      } else {
-        msg.author.send(msg.author + " doesn't have permission to execute eval!");
-      }
-    }
-  },
-  "register": {
-    usage: "<code>",
-    description: 'Registers your EVE account using your Discord Code',
-    process: function (bot, msg, models, suffix) {
-      models.aider_users.findOne({
-        where: {discord_id: suffix}
-      }).then(function (user) {
-        if (user && user.dataValues) {
-          user.update({
-            discord_id: msg.author.id
-          }).then(function (user) {
-            msg.author.send("Link Complete!");
-          });
-        }
-        else {
-          msg.author.send("Not Found!");
-        }
-        console.log(user);
-
-      });
+      msg.author.send("Your id is " + msg.author.id);
     }
   },
   "name": {
@@ -156,28 +101,22 @@ var commands = {
       }).catch(error => {console.log(error.message)});
     }
   },
-  "reset": {
-    description: 'Reset your registration for FEDUP Discord.',
+  "validate": {
+    usage: "<User>",
+    description: 'Registers your EVE account using your Discord Code',
     process: function (bot, msg, models, suffix) {
-      models.user.findOne({
-        where: {discord_id: msg.author.id}
-      }).then(function (user) {
-        if (user && user.dataValues) {
-          // delete user
-          user.destroy();
-          msg.author.send("You are reset... Hopefully!");
-        }
-        else {
-          msg.author.send("Not Found!");
-        }
-        //console.log(user);
-      });
-    }
-  },
-  "link": {
-    description: 'Tells you your EVE characters name.',
-    process: function (bot, msg, models, suffix) {
-      msg.author.send("http://services.jerkasauruswrecks.com:3000");
+      var args = suffix.split(' ');
+      var userToFind = args.shift();
+      var message = args.join(' ');
+
+      if (userToFind.startsWith('<@')) {
+        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
+      } else {
+        userToFind = msg.author.id
+      }
+      console.log(msg.guild.members.resolve(userToFind));
+      botUtils.validate(msg, models, bot, msg.guild.members.resolve(userToFind));
+      msg.channel.send("Validatation Complete");
     }
   },
   "testfoo": {
@@ -222,7 +161,7 @@ var commands = {
       //msg.author.send(JSON.stringify(msg.guild.roles.cache.find(role => role.name === "Member")));
     }
   },
-  "corp": {
+  /*"corp": {
     description: 'Displays your corporation',
     process: function (bot, msg, models, suffix) {
       models.user.findOne({
@@ -310,23 +249,7 @@ var commands = {
       }
     }
   },
-  "validate": {
-    usage: "<User>",
-    description: 'Registers your EVE account using your Discord Code',
-    process: function (bot, msg, models, suffix) {
-      var args = suffix.split(' ');
-      var userToFind = args.shift();
-      var message = args.join(' ');
 
-      if (userToFind.startsWith('<@')) {
-        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
-      } else {
-        userToFind = msg.author.id
-      }
-      console.log(msg.guild.members.resolve(userToFind));
-      botUtils.validate(msg.guild, models, bot, msg.guild.members.resolve(userToFind));
-    }
-  },
   "channels": {
     description: "List available Discord channels",
     process: function (bot, msg, models, suffix) {
@@ -537,7 +460,7 @@ var commands = {
         }
       });
     }
-  }
+  }*/
 };
 
 

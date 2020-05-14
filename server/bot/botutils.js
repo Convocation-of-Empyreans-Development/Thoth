@@ -28,10 +28,11 @@ function getName(member){
   return member.nickname?member.nickname:member.user.username;
 }
 
-function validate(guild, models, bot, member) {
+function validate(msg, models, bot, member) {
+  guild = msg.guild;
   console.log("Validating... " + getName(member));
   console.log(member.user);
-  
+
 
   // Step 1: pull user on server w/ rolls
   models.aider_users.findOne({where:{discord_id: member.id}, include:[{
@@ -92,7 +93,7 @@ function validate(guild, models, bot, member) {
       });
 
     } else {
-      console.log(getName(member) + ' not found');
+      msg.channel.send(getName(member) + ' not found');
     }
   }).catch(error => {console.log(error.message)});
 }

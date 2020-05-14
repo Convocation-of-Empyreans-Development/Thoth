@@ -46,12 +46,28 @@ if (!Config.hasOwnProperty("commandPrefix")) {
 
 bot.on("ready", function () {
   bot.user.setStatus("online");
-
+  schedule.scheduleJob({second: 30}, () => {
+    console.log("Refresh Time.");
+    setTime();
+  });
   schedule.scheduleJob({hour: 18, minute: 0}, () => {
     console.log('Running mass validate NOT IMPLIMENTED');
     //massValidate(bot);
   });
 });
+
+function setTime(){
+  let time = new Date();
+  var hour = time.getUTCHours() < 10? '0' + time.getUTCHours(): time.getUTCHours();
+  var min = time.getUTCMinutes() < 10? '0' + time.getUTCMinutes(): time.getUTCMinutes();
+  var text = "|  " + hour + ":" + min + " YC" + (time.getUTCFullYear() - 1898) + " New Eden Time";
+
+  bot.user.setActivity(text);
+  /*schedule.scheduleJob({second: 30}, () => {
+    console.log("Refresh Time. Last Post: " + text);
+    setTime();
+  });*/
+}
 
 bot.on("disconnected", function () {
   console.log("Disconnected!");
@@ -80,20 +96,21 @@ bot.sendMessage = function (channel, message) {
   bot.channels.get(bot_testing).send(message);
 }
 
-/*bot.on("presenceUpdate", function(oldp, newp){
+bot.on("presenceUpdate", function(oldp, newp){
 
   newp.activities.forEach((item, i) => {
-    console.log(item);
+    //console.log(item);
   });
 
 
   let streams = newp.activities.filter(e => e.type == "STREAMING");
   if (streams.length > 0) {
-    let guild = bot.guilds.resolve(stream.guild);
-    let member = guild.member(stream.userID);
-    console.log(member);
+    //let guild = bot.guilds.resolve(stream.guild);
+    //let member = guild.member(stream.userID);
+    //console.log(member);
+    console.log("Stream detected ");
   }
-});*/
+});
 
 function checkMessageForCommand(msg, isEdit) {
 	//console.log(msg.content.length);
