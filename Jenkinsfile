@@ -13,8 +13,12 @@ pipeline {
       }
     }
     stage('run-bot') {
+      environment {
+           DISCORD_BOT_TOKEN = credentials('discord_bot_token')
+           JENKINS_BUILD     = true
+      }
       steps {
-        sh 'node ./server.js'
+        sh 'npm test'
       }
     }
   }

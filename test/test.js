@@ -8,7 +8,7 @@ describe("Discord bot", function() {
     describe("#initialize", function() {
         it("should log in using the provided token", function() {
             let token;
-            if (process.env.GITHUB_ACTIONS) {
+            if (process.env.GITHUB_ACTIONS || process.env.JENKINS_BUILD) {
                 token = process.env.DISCORD_BOT_TOKEN;
             } else {
                 var AuthDetails = require("../../secret/discordSecret.json");
