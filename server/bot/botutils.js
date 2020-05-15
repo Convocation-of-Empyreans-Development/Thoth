@@ -191,6 +191,7 @@ function massValidate (guild, models, bot) {
       });
     }
   });*/
+}
 
 /**
  * Returns an array of the role names a Discord guild member possesses.
@@ -291,7 +292,6 @@ function getCurrentRoles(guildMember) {
       });
     });
   }
-}
 
 
 module.exports.findAiderRoleByID = findAiderRoleByID;
