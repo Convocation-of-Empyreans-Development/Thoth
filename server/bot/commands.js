@@ -176,7 +176,7 @@ var commands = {
         let announcementsChannel = guild.channels.get(convocationChannels.announcements);
         const embed = new Discord.MessageEmbed()
             .setAuthor(guildMember.nickname)
-            .setDescription(msg.content);
+            .setDescription(msg.content.replace("/^(\!announce) /", ""));
         announcementsChannel.send(embed);
       } else {
         console.log(`Received !announce from ${guildMember.nickname} without role or not in DM; ignoring`);
