@@ -191,11 +191,17 @@ function massValidate (guild, models, bot) {
       });
     }
   });*/
+}
 
-  function getCurrentRoles(guildMember) {
-    var roles = guildMember.roles;
-    return roles.array().map(role => role.name);
-  }
+/**
+ * Returns an array of the role names a Discord guild member possesses.
+ * @param {Discord.GuildMember} guildMember
+ * @returns {Array<String>} an array of role names
+ */
+function getCurrentRoles(guildMember) {
+  var roles = guildMember.roles;
+  return roles.array().map(role => role.name);
+}
 
   function getCurrentAutomaticRoles(guildMember) {
     var roles = guildMember.roles;
@@ -286,10 +292,10 @@ function massValidate (guild, models, bot) {
       });
     });
   }
-}
 
 
 module.exports.findAiderRoleByID = findAiderRoleByID;
 module.exports.findDiscordRoleByAiderRole = findDiscordRoleByAiderRole;
 module.exports.massValidate = massValidate;
 module.exports.validate = validate;
+module.exports.getCurrentRoles = getCurrentRoles;
