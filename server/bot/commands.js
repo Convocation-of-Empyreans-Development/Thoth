@@ -2,6 +2,7 @@ var joinableChannels = require('./joinableChannels.js');
 var botUtils = require('./botutils.js');
 const {convocationChannels} = require("./channels.js");
 const {getCurrentRoles} = require("./botutils");
+var Discord = require("discord.js");
 
 var commands = {
   "ping": {
@@ -165,24 +166,32 @@ var commands = {
   },
   "announce": {
     usage: "<message>",
-    description: "Send a message to the Announcements channel if the user has the Broadcaster role [DM only]",
+    description: "Send a message to the Announcements channel if the user has the Broadcaster role",
     process: function (bot, msg, models, suffix) {
       // Get the user's GuildMember instance
-      let guild = bot.guilds.get(convocationChannels.server);
-      let guildMember = guild.members.get(msg.author.id);
+
+      let guild = msg.guild;
+      let guildMember = msg.member;
       let memberRoles = getCurrentRoles(guildMember);
+
+      //channel = member.guild.channels.cache.find(ch => ch.name === 'general');
+      console.log(guild.channels.cache.find(ch => ch.name === 'announcements'));
       // Verify if the message was sent via Direct Message to the bot
-      if (msg.channel.type === "dm" && memberRoles.includes("Broadcaster")) {
-        let announcementsChannel = guild.channels.get(convocationChannels.announcements);
-        const embed = new Discord.MessageEmbed()
-            .setAuthor(guildMember.nickname)
-            .setDescription(msg.content.replace("/^(\!announce) /", ""));
-        announcementsChannel.send(embed);
+      if ( memberRoles.indexOf("Broadcaster") != -1) {
+          announcementsChannel = guild.channels.cache.find(ch => ch.name === 'announcements')
+          const embed = new Discord.MessageEmbed()
+              .setAuthor(botUtils.getName(guildMember))
+              .setDescription(msg.content.replace("//announce", ""));
+          announcementsChannel.send(embed);
+
+
       } else {
-        console.log(`Received !announce from ${guildMember.nickname} without role or not in DM; ignoring`);
+        console.log(`Received //announce from ${guildMember.nickname} without role or not in DM; ignoring`);
       }
     }
   }
+
+  //msg.channel.type === "dm" &&
   /*"corp": {
     description: 'Displays your corporation',
     process: function (bot, msg, models, suffix) {

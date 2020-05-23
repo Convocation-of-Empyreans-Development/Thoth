@@ -1,5 +1,6 @@
 var roles = require('./roles.js');
 
+
 var findAiderRoleByID = function(guild, models, id, callback){
     models.aider_roles.findOne({where: {role_name: guild.roles.resolve(id).name}}).then(function(role) {
       callback(role);
@@ -199,13 +200,13 @@ function massValidate (guild, models, bot) {
  * @returns {Array<String>} an array of role names
  */
 function getCurrentRoles(guildMember) {
-  var roles = guildMember.roles;
-  return roles.array().map(role => role.name);
+  var roles = guildMember.roles.cache.array();
+  return roles.map(role => role.name);
 }
 
   function getCurrentAutomaticRoles(guildMember) {
     var roles = guildMember.roles;
-    return _.intersection(roles.array().map(role => role.name), automaticallyAssignedRoles);
+    return _.intersection(roles.cache.map(role => role.name), automaticallyAssignedRoles);
   }
 
   function getNewAutomaticRoles(user) {
@@ -299,3 +300,4 @@ module.exports.findDiscordRoleByAiderRole = findDiscordRoleByAiderRole;
 module.exports.massValidate = massValidate;
 module.exports.validate = validate;
 module.exports.getCurrentRoles = getCurrentRoles;
+module.exports.getName = getName;
