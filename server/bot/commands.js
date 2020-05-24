@@ -1,7 +1,7 @@
 var joinableChannels = require('./joinableChannels.js');
 var botUtils = require('./botutils.js');
 const {convocationChannels} = require("./channels.js");
-const {getCurrentRoles} = require("./botutils");
+const {distanceToDowntime, getCurrentRoles} = require("./botutils");
 
 var commands = {
   "ping": {
@@ -181,6 +181,48 @@ var commands = {
       } else {
         console.log(`Received !announce from ${guildMember.nickname} without role or not in DM; ignoring`);
       }
+    }
+  },
+  "requestvoice": {
+    description: "Request permission for voice activation usage in voice channels",
+    process: function (bot, msg, models, suffix) {
+      // TODO: extract this into a helper method
+      const role = msg.guild.roles.cache.find(role => role.name === "Voice Active Allowed");
+      const member = msg.mentions.members.first();
+      member.roles.add(role);
+
+      const embed = new Discord.MessageEmbed()
+          .setAuthor(msg.author.username)
+          .setTitle(`Voice activation request from ${msg.author.username}`)
+          .setDescription("React with ❌ to revoke this permission.");
+
+      // get bot admin channel
+      let adminChannel = msg.guild.channels.cache.get(convocationChannels.bot_admin);
+      // send embed to channel and react with ❌
+      adminChannel.send(embed).then(sent => {
+        sent.react("❌").then(() => {
+          const filter = (reaction) => {
+            return reaction.emoji.name === "❌";
+          }
+          sent.awaitReactions(filter, {max: 2, time: distanceToDowntime() * 1000, errors: ["time"]})
+              .then(_ => {
+                member.roles.remove(role);
+                // Create a new embed to prevent cache invalidation
+                // https://discordjs.guide/popular-topics/embeds.html#resending-a-received-embed
+                const embed = new Discord.MessageEmbed()
+                    .setAuthor("test")
+                    .setTitle(`Voice activation request from ${member.displayName} revoked manually`);
+                sent.edit(embed);
+              })
+              .catch(_ => {
+                member.roles.remove(role);
+                const embed = new Discord.MessageEmbed()
+                    .setAuthor("test")
+                    .setTitle(`Voice activation request from ${member.displayName} expired at downtime`);
+                sent.edit(embed);
+              });
+        });
+      })
     }
   }
   /*"corp": {

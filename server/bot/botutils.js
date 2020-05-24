@@ -1,4 +1,5 @@
 var roles = require('./roles.js');
+var moment = require("moment")
 
 var findAiderRoleByID = function(guild, models, id, callback){
     models.aider_roles.findOne({where: {role_name: guild.roles.resolve(id).name}}).then(function(role) {
@@ -293,9 +294,25 @@ function getCurrentRoles(guildMember) {
     });
   }
 
+/**
+ * Get the length of time in seconds until EVE's next downtime.
+ * Downtime occurs at 1100 UTC each day. If the time is after 1100 UTC, rollover to the next day.
+ */
+function distanceToDowntime() {
+  let currentTime = moment.utc();
+  let nextDowntime;
+  if (currentTime.hour() < 11) {
+    nextDowntime = moment().startOf("day").add(11, "hours");
+  } else {
+    nextDowntime = moment().startOf("day").add({days: 1, hours: 11});
+  }
+  return nextDowntime.diff(currentTime, "seconds");
+}
+
 
 module.exports.findAiderRoleByID = findAiderRoleByID;
 module.exports.findDiscordRoleByAiderRole = findDiscordRoleByAiderRole;
 module.exports.massValidate = massValidate;
 module.exports.validate = validate;
 module.exports.getCurrentRoles = getCurrentRoles;
+module.exports.distanceToDowntime = distanceToDowntime;
