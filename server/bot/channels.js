@@ -9,7 +9,8 @@ channels = {
 
 const convocationChannels = {
   server: "368899518818942976",
-  announcements: "603633479380500500"
+  announcements: "603633479380500500",
+  bot_admin: "713876962921152550"
 }
 
 module.exports.channels = channels;
