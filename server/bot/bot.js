@@ -47,7 +47,7 @@ if (!Config.hasOwnProperty("commandPrefix")) {
 bot.on("ready", function () {
   bot.user.setStatus("online");
   schedule.scheduleJob({second: 30}, () => {
-    console.log("Refresh Time.");
+    console.log("Refresh Time. " + buildTime());
     setTime();
   });
   schedule.scheduleJob({hour: 18, minute: 0}, () => {
@@ -57,16 +57,15 @@ bot.on("ready", function () {
 });
 
 function setTime(){
+  bot.user.setActivity(buildTime());
+}
+
+function buildTime(){
   let time = new Date();
   var hour = time.getUTCHours() < 10? '0' + time.getUTCHours(): time.getUTCHours();
   var min = time.getUTCMinutes() < 10? '0' + time.getUTCMinutes(): time.getUTCMinutes();
   var text = "|  " + hour + ":" + min + " YC" + (time.getUTCFullYear() - 1898) + " New Eden Time";
-
-  bot.user.setActivity(text);
-  /*schedule.scheduleJob({second: 30}, () => {
-    console.log("Refresh Time. Last Post: " + text);
-    setTime();
-  });*/
+  return text;
 }
 
 bot.on("disconnected", function () {
@@ -105,9 +104,10 @@ bot.on("presenceUpdate", function(oldp, newp){
 
   let streams = newp.activities.filter(e => e.type == "STREAMING");
   if (streams.length > 0) {
+    let stream = streams[0];
     //let guild = bot.guilds.resolve(stream.guild);
     //let member = guild.member(stream.userID);
-    //console.log(member);
+    console.log(stream);
     console.log("Stream detected ");
   }
 });
