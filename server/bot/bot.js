@@ -118,7 +118,7 @@ function checkMessageForCommand(msg, isEdit) {
   if (msg.author.id != bot.user.id
     && (msg.content.startsWith(Config.commandPrefix))
     && msg.content.length > 1
-    && msg.channel.name == 'bot-commands') {
+    && (msg.channel.name == 'bot-commands' || msg.channel.name == 'bot-spam')) {
     console.log("treating " + msg.content + " from " + msg.author + " as command");
     var cmdTxt = msg.content.split(" ")[0].substring(Config.commandPrefix.length);
     var suffix = msg.content.substring(cmdTxt.length + Config.commandPrefix.length + 1); //add one for the ! and one for the space

@@ -107,21 +107,19 @@ var commands = {
   "validate": {
     usage: "<User>",
     description: 'Registers your EVE account using your Discord Code',
-    process: function (bot, msg, models, suffix) {
-      var args = suffix.split(' ');
-      var userToFind = args.shift();
-      var message = args.join(' ');
-
-      if (userToFind.startsWith('<@')) {
-        userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
-      } else {
-        userToFind = msg.author.id
-      }
-      console.log(msg.guild.members.resolve(userToFind));
-      botUtils.validate(msg, models, bot, msg.guild.members.resolve(userToFind));
-      msg.channel.send("Validatation Complete");
-    }
+    process: Validate
   },
+  "v": {
+      usage: "<User>",
+      description: 'Registers your EVE account using your Discord Code',
+      process: Validate
+  },
+  "vo": {
+      usage: "<User>",
+      description: 'Registers your EVE account using your Discord Code with override for Recruiters',
+      process: ValdiateWithOverride
+  },
+
   "testfoo": {
     description: 'testfoo',
     process: function (bot, msg, models, suffix) {
@@ -493,6 +491,37 @@ var commands = {
     }
   }*/
 };
+
+function ValdiateWithOverride(bot, msg, models, suffix) {
+  Validate(bot, msg, models, suffix, true);
+}
+
+
+function Validate (bot, msg, models, suffix, override = false) {
+  var args = suffix.split(' ');
+  var userToFind = args.shift();
+  var message = args.join(' ');
+  if(override){
+    // check if calling user is a Recruiter
+    override = false;
+    author = msg.guild.members.resolve(msg.author);
+
+    author.roles.cache.forEach((discordRole, i) => {
+      if(discordRole.name == 'Recruiter'){
+        console.log('Recruiter Verified, override accepted');
+        override = true;
+      }
+    });
+  }
+  if (userToFind.startsWith('<@')) {
+    userToFind = userToFind.replace('<', '').replace('>', '').replace('@', '').replace('!', '');
+  } else {
+    userToFind = msg.author.id
+  }
+  console.log(msg.guild.members.resolve(userToFind));
+  botUtils.validate(msg, models, bot, msg.guild.members.resolve(userToFind), override);
+  msg.channel.send("Validatation Complete");
+}
 
 
 module.exports = commands;
