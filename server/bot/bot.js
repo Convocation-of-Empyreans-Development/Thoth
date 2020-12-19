@@ -465,7 +465,7 @@ var initialize = (db) => {
   if (process.env.GITHUB_ACTIONS || process.env.JENKINS_BUILD) {
     bot.login(process.env.DISCORD_BOT_TOKEN);
   } else {
-    var AuthDetails = require("../../secret/discordSecret.json");
+    var AuthDetails = require("../../secret/discordsecret.json");
     bot.login(AuthDetails.bot_token);
   }
 }

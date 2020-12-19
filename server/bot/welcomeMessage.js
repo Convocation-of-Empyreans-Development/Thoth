@@ -7,4 +7,4 @@ module.exports = "Greetings again capsuleer, do not be alarmed.\n\n" +
 
   "If you are looking to apply to the Convocation\n\n" +
 
-  "Step 2: post !recruit in the #Bot-Command, or here.";
+  "Step 2: post //recruit in the #Bot-Command, or here.";
