@@ -6,7 +6,7 @@ var models = require("./server/models");
 var bot = require("./server/bot/bot.js");
 
 process.env.SECRET = "The darkness shall swallow the land, and in its wake there will follow a storm"
-var port = process.env.PORT || 3010;
+var port = process.env.PORT || 3000;
 
 //Setup bodyparser
 app.use(bodyParser.json());
